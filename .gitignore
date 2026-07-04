@@ -1,0 +1,10 @@
+cycling_weather_full.parquet
+*.parquet
+data/
+models/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+*.iml
