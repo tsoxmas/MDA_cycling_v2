@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -106,6 +107,21 @@ main_coef = main_coef.sort_values("abs_coef", ascending=False)
 main_coef.to_csv(p.res_dir / "ridge_main_coefficients.csv", index=False)
 
 print(main_coef)
+
+#plot
+plot_coef = main_coef.head(15).copy()
+plot_coef = plot_coef.sort_values("pct_change")
+colors = np.where(plot_coef["coef"] >= 0, "royalblue", "firebrick")
+plt.figure(figsize=(9, 6))
+plt.barh(plot_coef["feature"], plot_coef["pct_change"], color=colors)
+plt.axvline(0, color="black", linewidth=1)
+plt.title("Ridge coefficients — approximate effect on daily cycling count")
+plt.xlabel("Approximate percent change")
+plt.ylabel("")
+plt.grid(axis="x", alpha=0.3)
+plt.tight_layout()
+plt.savefig(p.fig_dir / "ridge_main_coefficients_percent.png", dpi=300)
+plt.close()
 
 
 wet = df[df["rain_day"] == 1].copy() # only rainy days because this is where the rain penalty can be estimated
