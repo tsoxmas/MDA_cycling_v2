@@ -1,3 +1,5 @@
+import geopandas
+import contextily
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -108,4 +110,51 @@ plt.legend()
 plt.grid(alpha=0.25)
 plt.tight_layout()
 plt.savefig(p.fig_dir / "fig9_cluster_pca_scatter.png", dpi=300)
+plt.close()
+
+# plot for the final clusters on the map
+heat = profile.set_index("cluster")[cluster_vars]
+heat_z = (heat - heat.mean()) / heat.std(ddof=0)
+plt.figure(figsize=(9, 4))
+plt.imshow(heat_z, aspect="auto")
+plt.xticks(range(len(cluster_vars)), cluster_vars, rotation=35, ha="right")
+plt.yticks(range(len(heat_z.index)), [f"Cluster {i}" for i in heat_z.index])
+plt.colorbar(label="standardized cluster mean")
+plt.title("Cluster profiles")
+plt.tight_layout()
+plt.savefig(p.fig_dir / "fig10_cluster_profiles_heatmap.png", dpi=200)
+plt.close()
+map_df = site.dropna(subset=["cluster", "site_lat", "site_lon"]).copy()
+
+gdf = geopandas.GeoDataFrame(map_df, geometry=geopandas.points_from_xy(map_df["site_lon"], map_df["site_lat"]),
+                             crs="EPSG:4326").to_crs(epsg=3857)
+colors = {1: "royalblue", 2: "salmon", 3: "lightgreen"}
+fig, ax = plt.subplots(figsize=(13, 8))
+
+xmin, ymin, xmax, ymax = gdf.total_bounds
+pad_x = (xmax - xmin) * 0.08
+pad_y = (ymax - ymin) * 0.12
+ax.set_xlim(xmin - pad_x, xmax + pad_x)
+ax.set_ylim(ymin - pad_y, ymax + pad_y)
+
+contextily.add_basemap(ax, source=contextily.providers.CartoDB.Positron, zoom=10, attribution=False)
+
+for cl in [1, 2, 3]:
+    part = gdf[gdf["cluster"] == cl]
+    part.plot(
+        ax=ax,
+        color=colors[cl],
+        markersize=45,
+        alpha=0.9,
+        edgecolor="black",
+        linewidth=0.4,
+        label=f"Cluster {cl}"
+    )
+
+ax.legend(loc="lower left", frameon=True)
+ax.set_title("Cycling site clusters in Flanders", fontsize=18)
+ax.set_axis_off()
+
+plt.tight_layout()
+plt.savefig(p.fig_dir / "fig11_cluster_map_flanders.png", dpi=400, bbox_inches="tight")
 plt.close()
