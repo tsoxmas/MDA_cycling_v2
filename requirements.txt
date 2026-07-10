@@ -12,3 +12,5 @@ geopandas>=1.1
 contextily>=1.7
 
 holidays
+
+shiny
