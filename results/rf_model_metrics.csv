@@ -1,2 +1,2 @@
-n_estimators,max_depth,test_start,rmse_log,mae_log,r2_log
-200,20,2024-11-18,0.7941503488283308,0.44469561336802405,0.6246030145210563
+n_estimators,max_depth,min_samples_leaf,test_start,rmse_log,mae_log,r2_log
+200,20,1,2024-11-18,0.7843817587604496,0.4402479183446856,0.6337814915190441

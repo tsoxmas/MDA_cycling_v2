@@ -20,8 +20,8 @@ df["log_rain"] = np.log1p(df["precip_mm"].fillna(0))
 df["site_rain"] = np.where(df["rain_day"] == 1, df["site_id"], "dry_day")
 
 # numeric weather/calendar/context variables
-num = ["log_rain", "rainy_slots", "heavy_slots", "temp_mean", "wind_mean", "gust_max", "hum_mean","pressure_mean",
-       "sun_min", "radiation_mean", "station_km", "dow", "month", "commute_share", "n_slots"]
+num = ["log_rain", "temp_mean", "wind_mean", "hum_mean", "pressure_mean", "radiation_mean",
+       "station_km", "dow", "month", "commute_share", "n_slots"]
 
 # categorical variables, site_rain is for site-specific rain response
 cat = ["site_id", "site_rain"]
@@ -120,7 +120,7 @@ plt.xlabel("Approximate percent change")
 plt.ylabel("")
 plt.grid(axis="x", alpha=0.3)
 plt.tight_layout()
-plt.savefig(p.fig_dir / "ridge_main_coefficients_percent.png", dpi=300)
+plt.savefig(p.fig_dir / "fig6_ridge_main_coefficients_percent.png", dpi=300)
 plt.close()
 
 
@@ -128,7 +128,7 @@ wet = df[df["rain_day"] == 1].copy() # only rainy days because this is where the
 
 x_wet = wet[num + cat + binary].copy()
 x_dry = x_wet.copy()
-rain_cols = ["log_rain", "rain_day", "heavy_rain_day", "rainy_slots", "heavy_slots"]
+rain_cols = ["log_rain", "rain_day", "heavy_rain_day"]
 x_dry[rain_cols] = 0
 x_dry["site_rain"] = "dry_day" # same rows but pretending there was no rain
 

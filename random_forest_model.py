@@ -20,8 +20,8 @@ df["y"] = np.log1p(df["total_count"]) # using log transformation for the depende
 df["log_rain"] = np.log1p(df["precip_mm"].fillna(0))
 
 # numeric weather/calendar/context variables
-num = ["log_rain", "rainy_slots", "heavy_slots", "temp_mean", "wind_mean", "gust_max", "hum_mean","pressure_mean",
-       "sun_min", "radiation_mean", "station_km", "dow", "month", "commute_share", "n_slots"]
+num = ["log_rain", "temp_mean", "wind_mean", "hum_mean", "pressure_mean", "radiation_mean",
+       "station_km", "dow", "month", "commute_share", "n_slots"]
 
 # categorical variable
 cat = ["site_id"]

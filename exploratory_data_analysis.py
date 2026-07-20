@@ -11,20 +11,15 @@ import paths as p
 import numpy as np
 
 sample_frac = 0.05
-weather_cols = [
-    "precip_quantity",
-    "temp_dry_shelter_avg",
-    "wind_speed_10m",
-    "wind_gusts_speed",
-    "humidity_rel_shelter_avg",
-    "pressure",
-    "sun_duration",
-    "short_wave_from_sky_avg",
-]
-num_cols = ["count", *weather_cols]
 
 
 day = pd.read_parquet(p.res_dir / "site_day_panel.parquet")
+day["log_rain"] = np.log1p(day["precip_mm"].fillna(0))
+
+model_cols = ["total_count", "log_rain", "rain_day", "heavy_rain_day", "temp_mean", "wind_mean", "hum_mean",
+              "pressure_mean", "radiation_mean", "station_km", "dow", "month", "commute_share", "n_slots", "weekend",
+              "holiday", "covid"]
+
 month_avg = day.groupby("month")["total_count"].mean()
 plt.figure(figsize=(7, 4))
 plt.plot(month_avg.index, month_avg.values, marker="o")
@@ -33,7 +28,7 @@ plt.xlabel("Month")
 plt.ylabel("Average daily cyclists per site")
 plt.xticks(range(1, 13))
 plt.tight_layout()
-plt.savefig(p.fig_dir / "eda_monthly_volume.png", dpi=300)
+plt.savefig(p.fig_dir / "fig0_monthly_volume.png", dpi=300)
 plt.close()
 
 rng = np.random.default_rng(p.seed)
@@ -52,16 +47,13 @@ df["dayofweek"] = df["ts_local"].dt.dayofweek
 df["month"] = df["ts_local"].dt.month
 df["is_weekend"] = df["dayofweek"] >= 5
 
-summary = df[num_cols].describe(percentiles=[0.5, 0.95]).T.round(2)
-summary["pct_missing"] = (df[num_cols].isna().mean() * 100).round(2).values
+summary = day[model_cols].describe(percentiles=[0.5, 0.95]).T.round(2)
+summary["pct_missing"] = (day[model_cols].isna().mean() * 100).round(2).values
 summary.to_csv(p.res_dir / "eda_variable_summary.csv")
 
 missing = pd.DataFrame(
-    {
-        "n_missing": df.isna().sum(),
-        "pct_missing": (df.isna().mean() * 100).round(2),
-    }
-).sort_values("pct_missing", ascending=False)
+    {"n_missing": day[model_cols].isna().sum(),
+     "pct_missing": (day[model_cols].isna().mean() * 100).round(2)}).sort_values("pct_missing", ascending=False)
 missing.to_csv(p.res_dir / "eda_missing_summary.csv")
 
 hourly = df.groupby(["hour", "is_weekend"], observed=True)["count"].mean().reset_index()
@@ -146,7 +138,9 @@ plt.tight_layout()
 plt.savefig(p.fig_dir / "fig3_site_heterogeneity.png", bbox_inches="tight", dpi=180)
 plt.close()
 
-corr_matrix = df[weather_cols].corr()
+corr_cols = ["log_rain", "rain_day", "heavy_rain_day", "temp_mean", "wind_mean", "hum_mean", "pressure_mean",
+             "radiation_mean"]
+corr_matrix = day[corr_cols].corr()
 plt.figure(figsize=(8, 6.5))
 sns.heatmap(
     corr_matrix,
