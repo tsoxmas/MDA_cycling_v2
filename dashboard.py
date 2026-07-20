@@ -13,13 +13,11 @@ profile = pd.read_csv(p.res_dir / "cluster_profiles.csv")
 site = site.dropna(subset=["site_lat", "site_lon", "cluster"]).copy()
 site["cluster"] = site["cluster"].astype(int)
 
-cluster_name = {1: "Resilient high-exposure sites", 2: "Weather-sensitive commuter sites",
-                3: "Resilient lower-exposure sites"}
-cluster_focus = {1: "High cycling use and high rain exposure, but limited rain loss. "
-                    "Maintain capacity; check weather matching carefully.",
-                 2: "Main investment group for drainage, surface quality, lighting and route continuity.",
-                 3: "Low rain loss under more stable conditions. Maintain current quality and monitor as "
-                    "a resilient group."}
+cluster_name = {1: "Highest average rain penalty", 2: "Lowest average rain penalty",
+                3: "High rain exposure, moderate average penalty"}
+cluster_focus = {1: "Main group to check first for drainage, surface quality, lighting and route continuity.",
+                 2: "High cycling use and low estimated rain loss. Keep capacity and monitor as the stable group.",
+                 3: "Small high-rain-exposure group. Check weather matching and local exposure before reading it too strongly."}
 colors = {1: "royalblue", 2: "salmon", 3: "lightgreen"}
 
 site["cluster_name"] = site["cluster"].map(cluster_name)
@@ -64,9 +62,9 @@ app_ui = ui.page_sidebar(
     ui.sidebar(
         ui.h4("Filters"),
         ui.input_checkbox_group("picked_clusters", "Clusters",
-                                choices={"1": "1 — Resilient high-exposure sites",
-                                         "2": "2 — Weather-sensitive commuter sites",
-                                         "3": "3 — Resilient lower-exposure sites"},
+                                choices={"1": "1 — Highest average rain penalty",
+                                         "2": "2 — Lowest average rain penalty",
+                                         "3": "3 — High rain exposure, moderate average penalty"},
                                 selected=["1", "2", "3"]),
         ui.input_slider("min_count", "Minimum typical daily cyclists", min=int(site["median_daily_count"].min()),
                         max=int(site["median_daily_count"].max()), value=int(site["median_daily_count"].min())),
@@ -117,7 +115,7 @@ app_ui = ui.page_sidebar(
     ),
 
     ui.h2("Cycling weather-resilience dashboard"),
-    ui.p("The clusters separate sites by weather sensitivity, rain exposure and cycling volume.", class_="small-note"),
+    ui.p("The clusters describe average site profiles. The review table is sorted by absolute rainy-day loss, so high-volume sites can still appear high there.", class_="small-note"),
 
     ui.layout_columns(
         ui.value_box("Sites shown", ui.output_text("n_sites")),
@@ -250,7 +248,7 @@ def server(input, output, session):
 
         data["commute_share"] = 100 * data["commute_share"]
 
-        data = data.rename(columns={"site_id": "Site", "cluster": "Cluster", "cluster_name": "Site type",
+        data = data.rename(columns={"site_id": "Site", "cluster": "Cluster", "cluster_name": "Cluster profile",
                                     "median_daily_count": "Typical daily cyclists",
                                     "rain_loss_pct": "Rain loss (%)",
                                     "estimated_rain_loss": "Estimated rainy-day loss",

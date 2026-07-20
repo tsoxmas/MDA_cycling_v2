@@ -31,7 +31,7 @@ prep = Pipeline([("fill", SimpleImputer(strategy="median")), ("scale", StandardS
 x_scaled = prep.fit_transform(x)
 
 # remove a few unusual sites so they do not affect the clusters too much and compromises silhouette width
-outlier_model = IsolationForest(contamination=0.05, random_state=p.seed)
+outlier_model = IsolationForest(contamination=0.08, random_state=p.seed)
 keep_site = outlier_model.fit_predict(x_scaled) == 1
 site["used_in_clustering"] = keep_site
 site["cluster"] = np.nan
@@ -148,8 +148,7 @@ for cl in [1, 2, 3]:
         alpha=0.9,
         edgecolor="black",
         linewidth=0.4,
-        label=f"Cluster {cl}"
-    )
+        label=f"Cluster {cl}")
 
 ax.legend(loc="lower left", frameon=True)
 ax.set_title("Cycling site clusters in Flanders", fontsize=18)
