@@ -138,8 +138,7 @@ plt.tight_layout()
 plt.savefig(p.fig_dir / "fig3_site_heterogeneity.png", bbox_inches="tight", dpi=180)
 plt.close()
 
-corr_cols = ["log_rain", "rain_day", "heavy_rain_day", "temp_mean", "wind_mean", "hum_mean", "pressure_mean",
-             "radiation_mean"]
+corr_cols = ["log_rain", "temp_mean", "wind_mean", "hum_mean", "pressure_mean", "radiation_mean"]
 corr_matrix = day[corr_cols].corr()
 plt.figure(figsize=(8, 6.5))
 sns.heatmap(
@@ -152,7 +151,7 @@ sns.heatmap(
     vmax=1,
     square=True,
 )
-plt.title("Correlations between weather features")
+plt.title("Correlations between selected weather features")
 plt.tight_layout()
 plt.savefig(p.fig_dir / "fig4_weather_correlations.png", bbox_inches="tight", dpi=180)
 plt.close()
