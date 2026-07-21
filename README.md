@@ -4,6 +4,8 @@ This project uses cycling counter data from Flanders to look at cycling volume, 
 
 The raw data is 15-minute cycling counts joined with weather data. I turn it into a daily site-level table and then use it to estimate rain loss, compare sites, group them into clusters, and show the results on a map.
 
+![Dashboard preview](200_d.gif)
+
 ## running the project
 
 Run the scripts from the project folder.
