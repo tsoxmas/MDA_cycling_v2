@@ -24,6 +24,33 @@ The dashboard comes after the clustering step:
 shiny run --reload dashboard.py
 ```
 
+## running with docker
+
+If Docker is installed, the project can also be run from a container.
+
+First build it from the project folder:
+
+```bash
+docker build -t mda-cycling .
+```
+
+Then run it with the parquet file mounted from `data/`:
+
+```bash
+docker run --rm --name mda-cycling \
+  -p 127.0.0.1:8000:8000 \
+  --mount type=bind,source="$(pwd)/data/cycling_weather_full.parquet",target=/app/data/cycling_weather_full.parquet,readonly \
+  mda-cycling
+```
+
+Then open:
+
+```text
+http://localhost:8000
+```
+
+The container runs the analysis scripts first and then starts the dashboard.
+
 ## setup
 
 Install the packages:
