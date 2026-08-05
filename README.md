@@ -39,7 +39,7 @@ Then run it with the parquet file mounted from `data/`:
 ```bash
 docker run --rm --name mda-cycling \
   -p 127.0.0.1:8000:8000 \
-  --mount type=bind,source="$(pwd)/data/cycling_weather_full.parquet",target=/app/data/cycling_weather_full.parquet,readonly \
+  -v "$(pwd)/data/cycling_weather_full.parquet:/app/data/cycling_weather_full.parquet:ro" \
   mda-cycling
 ```
 
